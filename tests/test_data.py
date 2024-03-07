@@ -60,3 +60,79 @@ def test_egalite():
     tache4 = Tache(nom="tache3", duree=30, prerequis=frozenset({"tache1", "tache2"}))
     assert tache1 != tache2
     assert tache3 == tache4
+
+
+def test_cahier_des_charges_valide():
+    """
+    Teste que le cahier des charges est valide.
+    """
+    tache1 = Tache(nom="tâche 1", duree=10, prerequis=frozenset())
+    tache2 = Tache(nom="tâche 2", duree=20, prerequis=frozenset({"tâche 1"}))
+    tache3 = Tache(nom="tâche 3", duree=30, prerequis=frozenset({"tâche 2"}))
+
+    cahier_des_charges = CahierDesCharges(taches=frozenset({tache1, tache2, tache3}))
+
+    assert len(cahier_des_charges.taches) == 3
+    assert tache1 in cahier_des_charges.taches
+    assert tache2 in cahier_des_charges.taches
+    assert tache3 in cahier_des_charges.taches
+
+
+def test_cahier_des_charges_invalide():
+    """
+    Teste que le cahier des charges est invalide si une tâche a un prérequis qui n'existe pas.
+    """
+    tache1 = Tache(nom="tâche 1", duree=10, prerequis=frozenset())
+    tache2 = Tache(nom="tâche 2", duree=20, prerequis=frozenset({"tâche 1"}))
+    tache3 = Tache(nom="tâche 3", duree=30, prerequis=frozenset({"tâche 4"}))
+
+    with pytest.raises(ValueError):
+        CahierDesCharges(taches=frozenset({tache1, tache2, tache3}))
+
+
+def test_cahier_des_charges_immuable():
+    """
+    Teste que le cahier des charges est immuable.
+    """
+    tache1 = Tache(nom="tâche 1", duree=10, prerequis=frozenset())
+    tache2 = Tache(nom="tâche 2", duree=20, prerequis=frozenset({"tâche 1"}))
+    tache3 = Tache(nom="tâche 3", duree=30, prerequis=frozenset({"tâche 2"}))
+
+    cahier_des_charges = CahierDesCharges(taches=frozenset({tache1, tache2, tache3}))
+
+    with pytest.raises(ValidationError):
+        cahier_des_charges.taches = frozenset({tache1, tache2})
+
+    with pytest.raises(AttributeError):
+        cahier_des_charges.taches.add(tache3)
+
+    with pytest.raises(AttributeError):
+        cahier_des_charges.taches.remove(tache1)
+
+
+def test_serialisation_tache():
+    tache = Tache(nom="tâche 1", duree=10)
+    json_tache = tache.model_dump_json()
+    assert json_tache == '{"nom":"tâche 1","duree":10.0,"prerequis":[]}'
+
+
+def test_serialisation_deserialisation_tache():
+    tache = Tache(nom="tâche 1", duree=10)
+    json_tache = tache.model_dump_json()
+    tache_deserialisee = Tache.model_validate_json(json_tache)
+    assert tache == tache_deserialisee
+
+
+def test_serialisation_deserialisation_cahier_des_charges():
+    cdc = CahierDesCharges(
+        taches=frozenset(
+            [
+                Tache(nom="tâche 1", duree=10),
+                Tache(nom="tâche 2", duree=20, prerequis=frozenset(["tâche 1"])),
+                Tache(nom="tâche 3", duree=30, prerequis=frozenset(["tâche 2"])),
+            ]
+        )
+    )
+    json_cdc = cdc.model_dump_json()
+    cdc_deserialise = CahierDesCharges.model_validate_json(json_cdc)
+    assert cdc == cdc_deserialise
