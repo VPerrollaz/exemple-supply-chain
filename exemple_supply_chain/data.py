@@ -20,7 +20,7 @@ class Tache(BaseModel):
 
     nom: str
     duree: PositiveFloat | PositiveInt
-    prerequis: frozenset[str]
+    prerequis: frozenset[str] = frozenset()
 
     model_config = ConfigDict(frozen=True)
 
@@ -38,3 +38,18 @@ class Tache(BaseModel):
             int: Le hachage de la tâche.
         """
         return hash((self.nom, self.duree, self.prerequis))
+
+
+class CahierDesCharges(BaseModel):
+    taches: frozenset[Tache]
+
+    model_config = ConfigDict(frozen=True)
+
+    @field_validator("taches")
+    def prerequis_existent(cls, taches):
+        noms = set(tache.nom for tache in taches)
+        for tache in taches:
+            for prerequis in tache.prerequis:
+                if prerequis not in noms:
+                    raise ValueError(f"{prerequis} n'est pas un prérequis valide!")
+        return taches

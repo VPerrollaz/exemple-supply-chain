@@ -7,6 +7,7 @@ Tests du module data.py
 
 import pytest
 from exemple_supply_chain.data import Tache, CahierDesCharges
+from pydantic import ValidationError
 
 
 def test_creation_tache():
@@ -42,9 +43,11 @@ def test_hash():
     tache1 = Tache(nom="tache1", duree=10, prerequis=frozenset())
     tache2 = Tache(nom="tache2", duree=20, prerequis=frozenset({"tache1"}))
     tache3 = Tache(nom="tache3", duree=30, prerequis=frozenset({"tache1", "tache2"}))
+    tache4 = Tache(nom="tache3", duree=30, prerequis=frozenset({"tache1", "tache2"}))
     assert hash(tache1) != hash(tache2)
     assert hash(tache1) != hash(tache3)
     assert hash(tache2) != hash(tache3)
+    assert hash(tache3) == hash(tache4)
 
 
 def test_egalite():
