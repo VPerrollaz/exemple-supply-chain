@@ -6,7 +6,7 @@ Tests du module data.py
 """
 
 import pytest
-from exemple_supply_chain.data import Tache
+from exemple_supply_chain.data import Tache, CahierDesCharges
 
 
 def test_creation_tache():
@@ -31,12 +31,8 @@ def test_prerequis_cyclique():
     """
     Teste la détection de prérequis cycliques.
     """
-    tache1 = Tache(nom="tache1", duree=10, prerequis=frozenset())
-    tache2 = Tache(nom="tache2", duree=20, prerequis=frozenset({"tache1"}))
     with pytest.raises(ValueError):
-        Tache(
-            nom="tache3", duree=30, prerequis=frozenset({"tache1", "tache2", "tache3"})
-        )
+        Tache(nom="tache3", duree=30, prerequis=frozenset({"tache3"}))
 
 
 def test_hash():
@@ -60,3 +56,4 @@ def test_egalite():
     tache3 = Tache(nom="tache3", duree=30, prerequis=frozenset({"tache1", "tache2"}))
     tache4 = Tache(nom="tache3", duree=30, prerequis=frozenset({"tache1", "tache2"}))
     assert tache1 != tache2
+    assert tache3 == tache4
