@@ -78,15 +78,15 @@ class Intervalle(BaseModel):
     """Classe représentant un intervalle de temps.
 
     Attributes:
-        debut (PositiveFloat): Le début de l'intervalle.
-        fin (PositiveFloat): La fin de l'intervalle.
+        debut (float): Le début de l'intervalle.
+        fin (float): La fin de l'intervalle.
 
     Raises:
         ValueError: Si la fin est avant le début.
     """
 
-    debut: PositiveFloat
-    fin: PositiveFloat
+    debut: float
+    fin: float
 
     @model_validator(mode="before")
     def bon_ordre(cls, donnees: Any) -> Any:

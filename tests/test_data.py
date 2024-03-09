@@ -140,11 +140,3 @@ def test_creation_intervalle_invalide():
         Intervalle(debut=3.0, fin=2.0)
 
     assert "La fin est avant le début" in str(excinfo.value)
-
-
-def test_creation_intervalle_valeurs_negatives():
-    """Test la création d'un intervalle avec des valeurs négatives."""
-    with pytest.raises(ValidationError) as excinfo:
-        Intervalle(debut=-2.0, fin=-1.0)
-
-    assert "Input should be greater than 0" in str(excinfo.value)
