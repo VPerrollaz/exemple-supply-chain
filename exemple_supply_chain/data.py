@@ -2,15 +2,14 @@
 # -*- coding: utf-8 -*-
 """Description.
 
-Classes principales.
+Classes principales: Tache, CahierDesCharges, Intervalle.
 """
-
-from pydantic import BaseModel, PositiveInt, PositiveFloat, ConfigDict, field_validator  # type: ignore
+from typing import Any
+from pydantic import BaseModel, PositiveInt, PositiveFloat, ConfigDict, field_validator, model_validator, ValidationError  # type: ignore
 
 
 class Tache(BaseModel):
-    """
-    Une classe représentant une tâche avec un nom, une durée et des prérequis.
+    """Une classe représentant une tâche avec un nom, une durée et des prérequis.
 
     Attributes:
         nom (str): Le nom de la tâche.
@@ -27,7 +26,7 @@ class Tache(BaseModel):
     @field_validator("prerequis")
     def absence_cycle(cls, prerequis, champs):
         if champs.data["nom"] in prerequis:
-            raise ValueError("Prérequis cyclique!")
+            raise ValueError(f"Prérequis {champs.data['nom']} cyclique!")
         return prerequis
 
     def __hash__(self):
@@ -41,15 +40,69 @@ class Tache(BaseModel):
 
 
 class CahierDesCharges(BaseModel):
+    """Classe représentant un cahier des charges.
+
+    Attributes:
+        taches (frozenset[Tache]): L'ensemble des tâches du cahier des charges.
+
+    Raises:
+        ValueError: Si un prérequis n'est pas une tâche valide.
+    """
+
     taches: frozenset[Tache]
 
     model_config = ConfigDict(frozen=True)
 
     @field_validator("taches")
-    def prerequis_existent(cls, taches):
-        noms = set(tache.nom for tache in taches)
+    def prerequis_existent(cls, taches: frozenset[Tache]) -> frozenset[Tache]:
+        """Vérifie que tous les prérequis des tâches existent dans l'ensemble des tâches.
+
+        Args:
+            taches (frozenset[Tache]): L'ensemble des tâches du cahier des charges.
+
+        Raises:
+            ValueError: Si un prérequis n'est pas une tâche valide.
+
+        Returns:
+            frozenset[Tache]: L'ensemble des tâches du cahier des charges.
+        """
+        noms_taches_existantes = set(tache.nom for tache in taches)
         for tache in taches:
             for prerequis in tache.prerequis:
-                if prerequis not in noms:
+                if prerequis not in noms_taches_existantes:
                     raise ValueError(f"{prerequis} n'est pas un prérequis valide!")
         return taches
+
+
+class Intervalle(BaseModel):
+    """Classe représentant un intervalle de temps.
+
+    Attributes:
+        debut (PositiveFloat): Le début de l'intervalle.
+        fin (PositiveFloat): La fin de l'intervalle.
+
+    Raises:
+        ValueError: Si la fin est avant le début.
+    """
+
+    debut: PositiveFloat
+    fin: PositiveFloat
+
+    @model_validator(mode="before")
+    def bon_ordre(cls, donnees: Any) -> Any:
+        """Vérifie que le début de l'intervalle est avant la fin.
+
+        Args:
+            donnees (Any): Les données de l'intervalle.
+
+        Raises:
+            ValueError: Si la fin est avant le début.
+
+        Returns:
+            Any: Les données de l'intervalle.
+        """
+        if donnees["debut"] > donnees["fin"]:
+            raise ValueError(
+                "La fin est avant le début: debut={valeurs[debut]} fin={valeurs[fin]}"
+            )
+        return donnees
