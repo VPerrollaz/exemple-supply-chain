@@ -4,7 +4,13 @@ Master MECEN première année.
 
 ## TODO
 
-- [x] Faire une librairie testée, typée, formattéé avec une documentation rudimentaire
+- [x] Faire une librairie
+  1. versionnée
+  2. avec gestion de dépendance par poetry
+  3. testée
+  4. typée
+  5. formattéé
+  6. documentée rudimentairement
 - [ ] Créer une interface en ligne de commande
 - [ ] Finir la documentation
 - [ ] Faire un README complet du projet
