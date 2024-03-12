@@ -5,7 +5,7 @@
 Classes principales: Tache, CahierDesCharges, Intervalle.
 """
 from typing import Any
-from pydantic import BaseModel, PositiveInt, PositiveFloat, ConfigDict, field_validator, model_validator, ValidationError  # type: ignore
+from pydantic import BaseModel, PositiveInt, PositiveFloat, ConfigDict, field_validator, model_validator  # type: ignore
 
 
 class Tache(BaseModel):
@@ -14,12 +14,12 @@ class Tache(BaseModel):
     Attributes:
         nom (str): Le nom de la tâche.
         duree (int | float): La durée de la tâche en minutes.
-        prerequis (FrozenSet[str]): Les prérequis de la tâche sous forme de noms de tâches.
+        prerequis (tuple[str]): Les prérequis de la tâche sous forme de noms de tâches.
     """
 
     nom: str
     duree: PositiveFloat | PositiveInt
-    prerequis: frozenset[str] = frozenset()
+    prerequis: tuple[str, ...] = tuple()
 
     model_config = ConfigDict(frozen=True)
 
@@ -43,28 +43,28 @@ class CahierDesCharges(BaseModel):
     """Classe représentant un cahier des charges.
 
     Attributes:
-        taches (frozenset[Tache]): L'ensemble des tâches du cahier des charges.
+        taches (tuple[Tache]): L'ensemble des tâches du cahier des charges.
 
     Raises:
         ValueError: Si un prérequis n'est pas une tâche valide.
     """
 
-    taches: frozenset[Tache]
+    taches: tuple[Tache, ...]
 
     model_config = ConfigDict(frozen=True)
 
     @field_validator("taches")
-    def prerequis_existent(cls, taches: frozenset[Tache]) -> frozenset[Tache]:
+    def prerequis_existent(cls, taches: tuple[Tache]) -> tuple[Tache]:
         """Vérifie que tous les prérequis des tâches existent dans l'ensemble des tâches.
 
         Args:
-            taches (frozenset[Tache]): L'ensemble des tâches du cahier des charges.
+            taches (tuple[Tache]): L'ensemble des tâches du cahier des charges.
 
         Raises:
             ValueError: Si un prérequis n'est pas une tâche valide.
 
         Returns:
-            frozenset[Tache]: L'ensemble des tâches du cahier des charges.
+            tuple[Tache]: L'ensemble des tâches du cahier des charges.
         """
         noms_taches_existantes = set(tache.nom for tache in taches)
         for tache in taches:
