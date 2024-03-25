@@ -11,6 +11,7 @@ Master MECEN première année.
   4. typée
   5. formattéé
   6. documentée rudimentairement
-- [ ] Créer une interface en ligne de commande
+- [x] Créer une interface en ligne de commande
+- [ ] Créer des tests d'intégration de l'interface en ligne de commande
 - [ ] Finir la documentation
 - [ ] Faire un README complet du projet
