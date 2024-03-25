@@ -2,6 +2,10 @@
 
 Master MECEN première année.
 
+Démonstration
+
+![Démonstration](./img/demonstration.gif)
+
 ## TODO
 
 - [x] Faire une librairie
