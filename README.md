@@ -17,6 +17,6 @@ Démonstration
   6. documentée rudimentairement
 - [x] Créer une interface en ligne de commande
 - [x] Créer un gif de démonstration avec asciinema et l'inclure dans le README
-- [ ] Créer des tests d'intégration de l'interface en ligne de commande
+- [x] Créer des tests d'intégration de l'interface en ligne de commande
 - [ ] Finir la documentation
 - [ ] Faire un README complet du projet
